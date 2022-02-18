@@ -1,23 +1,24 @@
-const fs = require('fs')
-const request = require('request');
-// const url = "https://api.thecatapi.com/v1/breeds/search?q=sib"
-const reqBreed = process.argv[2]
-const url = `https://api.thecatapi.com/v1/breeds/search?q=${reqBreed}`
+const request = require("request");
 
-if (!reqBreed){
-  console.log("No params were given")
-}
-  request(url, (error, response, body) => {
-    if (error) {
-      console.log(`Request Error:`, error)
-    } 
-      console.log('error:', error); // Print the error if one occurred
-      console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-      console.log('body:', body); // Print the HTML for the Google homepage.}
-        const data = JSON.parse(body); //now becomes an object
-        if (data.length === 0) {
-          console.log("Breed not found")
-        } else {
-        console.log(data[0].description)    
-        }
-});
+const fetchBreedDescription = function(breedName, callback) {
+  const URL = `https://api.thecatapi.com/v1/breeds/search/?q=${breedName}`;
+
+  request(URL, (error, response, body) => {
+    // console.log('error:', error);
+    // console.log('statusCode:', response && response.statusCode);
+    // console.log('body:', body);
+    const data = JSON.parse(body);
+    if (error === undefined) {
+      callback(error, null);
+      return;
+    }
+    if (!data[0]) {
+      callback(null, "Breed not found.");
+    } else {
+      callback(null, data[0].description);
+    }
+  });
+};
+
+module.exports = { fetchBreedDescription };
+
